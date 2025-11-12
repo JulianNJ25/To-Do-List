@@ -19,13 +19,13 @@ namespace To_Do_List.Mappers
         }
 
         // DTO -> Entity (for creation)
-        public static Comment ToEntity(this CommentCreateDto dto, int taskItemId)
+        public static Comment ToEntity(this CommentCreateDto dto, int taskItemId, int? parentCommentId = null)
         {
             return new Comment
             {
                 CommentText = dto.CommentText,
-                ParentCommentId = dto.ParentCommentId,
-                TaskItemId = taskItemId
+                TaskItemId = taskItemId,
+                ParentCommentId = parentCommentId // explicitly ensure it's a parent comment
             };
         }
 

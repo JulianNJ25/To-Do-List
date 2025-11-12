@@ -64,9 +64,12 @@ namespace To_Do_List.Controllers
             var task = await _context.TaskItems.FindAsync(id);
             if (task is null) return NotFound();
 
-            task.Title = dto.Title;
-            task.Description = dto.Description;
-            task.IsCompleted = (bool)dto.IsCompleted;
+            if (dto.Title is not null)
+                task.Title = dto.Title;
+            if (dto.Description is not null)
+                task.Description = dto.Description;
+            if (dto.IsCompleted.HasValue)
+                task.IsCompleted = dto.IsCompleted.Value;
 
             await _context.SaveChangesAsync();
             return NoContent();
