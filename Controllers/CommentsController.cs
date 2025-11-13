@@ -1,19 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using To_Do_List.Data;       
-using To_Do_List.Models;
 using To_Do_List.Dtos.Comment;
 using To_Do_List.Mappers;
+using To_Do_List.Models;
 
 namespace To_Do_List.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("to-do-list/tasks/{taskItemId}/comments")]
     public class CommentsController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public CommentsController(ApplicationDBContext context)
+        public CommentsController(ApplicationDbContext context)
         {
             _context = context;
         }

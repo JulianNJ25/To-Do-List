@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using To_Do_List.Data;
 using To_Do_List.Dtos.Task;
 using To_Do_List.Mappers;
 using To_Do_List.Models;
 namespace To_Do_List.Controllers
 {
+    [Authorize]
     [Route("to-do-list/task")]
     [ApiController]
     public class TaskItemController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
-        public TaskItemController(ApplicationDBContext context)
+        private readonly ApplicationDbContext _context;
+        public TaskItemController(ApplicationDbContext context)
         {
             _context = context;
         }

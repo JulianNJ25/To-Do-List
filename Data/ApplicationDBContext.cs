@@ -1,12 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using To_Do_List.Models;
 
 namespace To_Do_List.Data
 {
-    public class ApplicationDBContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        // database constructor 
-        public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
         {
 
         }
@@ -17,6 +18,8 @@ namespace To_Do_List.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             // Self-referencing: parent -> replies
             modelBuilder.Entity<Comment>()
                 .HasMany(c => c.Replies)

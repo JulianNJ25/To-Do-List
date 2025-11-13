@@ -11,7 +11,7 @@ using To_Do_List.Data;
 
 namespace To_Do_List.Migrations
 {
-    [DbContext(typeof(ApplicationDBContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20251112034359_DefaultStart")]
     partial class DefaultStart
     {
