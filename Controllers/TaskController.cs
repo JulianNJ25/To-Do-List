@@ -7,7 +7,7 @@ using To_Do_List.Models;
 namespace To_Do_List.Controllers
 {
     [Authorize]
-    [Route("to-do-list/task")]
+    [Route("api/tasks")]
     [ApiController]
     public class TaskItemController : ControllerBase
     {

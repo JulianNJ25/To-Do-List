@@ -10,7 +10,7 @@ namespace To_Do_List.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("to-do-list/tasks/{taskItemId}/comments")]
+    [Route("api/comments/{taskItemId}")]
     public class CommentsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -44,7 +44,7 @@ namespace To_Do_List.Controllers
         }
 
         // endpoint for replies
-        [HttpPost("/to-do-list/comments/{parentCommentId}/reply")]
+        [HttpPost("/api/comments/reply/{parentCommentId}")]
         public async Task<ActionResult<CommentReadDto>> ReplyToComment(int parentCommentId, CommentCreateDto dto)
         {
             var parent = await _context.Comments.FindAsync(parentCommentId);
@@ -62,22 +62,40 @@ namespace To_Do_List.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CommentReadDto>>> GetCommentsByTask(int taskItemId)
         {
-            // Ensure task exists
             if (!await _context.TaskItems.AnyAsync(t => t.Id == taskItemId))
                 return NotFound($"Task with id {taskItemId} not found.");
 
-            // Load only root comments (no parent)
-            var comments = await _context.Comments
-                .Include(c => c.Replies)
-                .Where(c => c.TaskItemId == taskItemId && c.ParentCommentId == null)
+            // Load ALL comments for the task (no filtering on parent)
+            var allComments = await _context.Comments
+                .Where(c => c.TaskItemId == taskItemId)
                 .ToListAsync();
 
-            // Map and return
-            var commentDtos = comments.Select(c => c.ToReadDto()).ToList();
-            return Ok(commentDtos);
+            // Convert to DTO dictionary for fast lookup
+            var dtoDict = allComments.ToDictionary(
+                c => c.Id,
+                c => c.ToReadDto()
+            );
+
+            // Build the tree
+            List<CommentReadDto> rootComments = new();
+
+            foreach (var comment in dtoDict.Values)
+            {
+                if (comment.ParentCommentId == null)
+                {
+                    rootComments.Add(comment);
+                }
+                else if (dtoDict.ContainsKey(comment.ParentCommentId.Value))
+                {
+                    dtoDict[comment.ParentCommentId.Value].Replies.Add(comment);
+                }
+            }
+
+            return Ok(rootComments);
         }
 
-        [HttpPut("/to-do-list/comments/{commentId}")]
+
+        [HttpPut("/api/comments/{commentId}")]
         public async Task<IActionResult> UpdateComment(int commentId, CommentCreateDto dto)
         {
             // Look up the comment by ID
@@ -95,7 +113,7 @@ namespace To_Do_List.Controllers
             return NoContent();
         }
 
-        [HttpDelete("/to-do-list/comments/{commentId}")]
+        [HttpDelete("/api/comments/{commentId}")]
         public async Task<IActionResult> DeleteComment(int commentId)
         {
             var comment = await _context.Comments
